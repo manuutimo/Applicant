@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mini E-Commerce</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f7f7f7;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 1em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+    }
+    #cart-button {
+      background: #fff;
+      border: none;
+      padding: 0.5em 1em;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    main {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 1em;
+      justify-content: center;
+    }
+    .product {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin: 1em;
+      padding: 1em;
+      width: 200px;
+      text-align: center;
+    }
+    .product button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      padding: 0.5em 1em;
+      cursor: pointer;
+      margin-top: 0.5em;
+    }
+    .product button:hover {
+      background-color: #218838;
+    }
+    #cart-modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    .cart-content {
+      background: white;
+      padding: 2em;
+      border-radius: 10px;
+      width: 300px;
+    }
+    .cart-content h2 {
+      margin-top: 0;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5em;
+    }
+    .cart-item button {
+      background: red;
+      border: none;
+      color: white;
+      padding: 0.2em 0.5em;
+      cursor: pointer;
+    }
+    .close-btn {
+      background: #333;
+      color: white;
+      border: none;
+      padding: 0.5em 1em;
+      margin-top: 1em;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Mini Store</h1>
+  <button id="cart-button">🛒 Cart (<span id="cart-count">0</span>)</button>
+</header>
+
+<main id="product-list">
+  <div class="product">
+    <h3>T-Shirt</h3>
+    <p>$19.99</p>
+    <button onclick="addToCart(1)">Add to Cart</button>
+  </div>
+  <div class="product">
+    <h3>Jeans</h3>
+    <p>$39.99</p>
+    <button onclick="addToCart(2)">Add to Cart</button>
+  </div>
+  <div class="product">
+    <h3>Sneakers</h3>
+    <p>$59.99</p>
+    <button onclick="addToCart(3)">Add to Cart</button>
+  </div>
+</main>
+
+<div id="cart-modal">
+  <div class="cart-content">
+    <h2>Your Cart</h2>
+    <div id="cart-items"></div>
+    <p><strong>Total: $<span id="cart-total">0.00</span></strong></p>
+    <button class="close-btn" onclick="closeCart()">Close</button>
+  </div>
+</div>
+
+<script>
+  const products = {
+    1: { name: "T-Shirt", price: 19.99 },
+    2: { name: "Jeans", price: 39.99 },
+    3: { name: "Sneakers", price: 59.99 }
+  };
+
+  let cart = {};
+
+  function addToCart(productId) {
+    if (cart[productId]) {
+      cart[productId].quantity += 1;
+    } else {
+      cart[productId] = {
+        name: products[productId].name,
+        price: products[productId].price,
+        quantity: 1
+      };
+    }
+    updateCartCount();
+  }
+
+  function updateCartCount() {
+    let totalItems = 0;
+    for (let id in cart) {
+      totalItems += cart[id].quantity;
+    }
+    document.getElementById("cart-count").innerText = totalItems;
+  }
+
+  function openCart() {
+    const cartItemsDiv = document.getElementById("cart-items");
+    cartItemsDiv.innerHTML = "";
+
+    let total = 0;
+
+    for (let id in cart) {
+      const item = cart[id];
+      total += item.price * item.quantity;
+
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "cart-item";
+      itemDiv.innerHTML = `
+        <span>${item.name} (x${item.quantity})</span>
+        <button onclick="removeFromCart(${id})">X</button>
+      `;
+      cartItemsDiv.appendChild(itemDiv);
+    }
+
+    document.getElementById("cart-total").innerText = total.toFixed(2);
+    document.getElementById("cart-modal").style.display = "flex";
+  }
+
+  function closeCart() {
+    document.getElementById("cart-modal").style.display = "none";
+  }
+
+  function removeFromCart(productId) {
+    delete cart[productId];
+    updateCartCount();
+    openCart(); // Refresh cart
+  }
+
+  document.getElementById("cart-button").addEventListener("click", openCart);
+</script>
+
+</body>
+</html>
